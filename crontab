@@ -1,0 +1,4 @@
+# Fires daily at 00:30 UTC = 06:00 IST
+# Format: min hour day month weekday command
+# Sources /etc/environment so Docker env vars (API keys, config) are available to the job.
+30 0 * * * root . /etc/environment; cd /app && /bin/sh /app/scripts/run_and_heartbeat.sh >> /app/logs/analyze.log 2>&1
