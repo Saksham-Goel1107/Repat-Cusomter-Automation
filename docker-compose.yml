@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+  customer-analysis:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Override the built-in schedule at build time, or use the env var below.
+        CRON_SCHEDULE: "${CRON_SCHEDULE:-0 1 * * *}"
+    image: customer-repeat-analysis:latest
+    container_name: customer-repeat-analysis
+    restart: unless-stopped
+
+    env_file:
+      - .env          # copy .env.example → .env and fill in your values
+
+    environment:
+      # These can also be set directly here instead of in .env
+      - TZ=Asia/Kolkata   # system timezone for log timestamps
+
+    volumes:
+      # Mount your service account key (never bake credentials into the image)
+      - ./credentials/service.json:/app/credentials/service.json:ro
+      # Persist logs and charts between container restarts
+      - ./logs:/app/logs
+
+    # Hard resource limits — tune for your server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+    # ── Run once immediately (one-shot mode) ────────────────────────────────
+    # Uncomment the profile block below and run:
+    #   docker compose --profile oneshot run --rm customer-analysis-once
+    profiles: []
+
+  # One-shot service: run the analysis right now without waiting for cron.
+  # Usage:  docker compose run --rm customer-analysis-oneshot
+  customer-analysis-oneshot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: customer-repeat-analysis:latest
+    container_name: customer-analysis-oneshot
+    restart: "no"
+    env_file:
+      - .env
+    environment:
+      - TZ=Asia/Kolkata
+    volumes:
+      - ./credentials/service.json:/app/credentials/service.json:ro
+      - ./logs:/app/logs
+    command: ["python", "-m", "src.main"]
+    profiles:
+      - oneshot

@@ -1,0 +1,14 @@
+# ─── Data processing ──────────────────────────────────────────────────────────
+pandas
+numpy
+openpyxl          # only needed if you ever read .xlsx locally; keeps import parity
+
+# ─── Google Sheets API ────────────────────────────────────────────────────────
+gspread
+gspread-dataframe
+google-auth
+google-auth-oauthlib   # needed by google-auth for scope handling
+
+# ─── Charting (headless) ─────────────────────────────────────────────────────
+# ─── Timezone handling ───────────────────────────────────────────────────────
+pytz
