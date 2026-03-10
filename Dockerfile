@@ -31,9 +31,8 @@ RUN if [ -f /app/crontab ]; then sed -i 's/\r$//' /app/crontab; fi
 # Setup Cronjob File into the container's cron.d
 COPY crontab /etc/cron.d/repeat-customer-cron
 
-# Give execution rights and apply cron job
-RUN chmod 0644 /etc/cron.d/repeat-customer-cron \
-    && crontab /etc/cron.d/repeat-customer-cron
+# Give execution rights — cron picks it up automatically from /etc/cron.d/
+RUN chmod 0644 /etc/cron.d/repeat-customer-cron
 
 # Dump container env vars into /etc/environment so system cron can read them,
 # then start cron and stream the job log (job output goes to /app/logs/analyze.log).
